@@ -1,6 +1,7 @@
 """Run a dense retrieval experiment and save a readable report."""
 import argparse
 from datetime import datetime
+from os.path import relpath
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -8,6 +9,21 @@ from rag.data import load_data
 from rag.evaluation import evaluate
 
 ROOT = Path(__file__).resolve().parent
+
+
+def format_metrics_table(name, model, representation, metrics):
+    columns = ["Recall@1", "Recall@3", "Recall@5", "Recall@10", "MRR@10"]
+    headers = ["Experiment", "Model", "Representation", *columns]
+    model = model.replace("|", "\\|").replace("\n", " ")
+    values = [f"`{name}`", f"`{model}`", representation,
+              *(f"{metrics[key]:.4f}" for key in columns)]
+    widths = [max(len(header), len(value)) for header, value in zip(headers, values)]
+    header = "| " + " | ".join(text.ljust(width) for text, width in zip(headers, widths)) + " |"
+    separator = "| " + " | ".join("-" * width if index < 3 else "-" * (width - 1) + ":"
+                                  for index, width in enumerate(widths)) + " |"
+    row = "| " + " | ".join(text.ljust(width) if index < 3 else text.rjust(width)
+                            for index, (text, width) in enumerate(zip(values, widths))) + " |"
+    return "\n".join([header, separator, row]) + "\n"
 
 
 def parse_args():
@@ -45,14 +61,14 @@ def main():
     retriever = DenseRetriever(corpus, args.model, args.representation,
                                args.cache_dir, args.rebuild_cache, args.offline)
     metrics = evaluate(queries, qrels, retriever.retrieve)
-    representation = "title + full abstract" if args.representation == "title-abstract" else "full abstract"
+    representation = "Title + full abstract" if args.representation == "title-abstract" else "Full abstract"
     timestamp = datetime.now(ZoneInfo("Europe/Berlin"))
     settings = {
         "Experiment": args.name,
         "Run time": timestamp.isoformat(timespec="seconds"),
         "Model": args.model,
         "Representation": representation,
-        "Dataset": str(args.data_dir.resolve()),
+        "Dataset": Path(relpath(args.data_dir.resolve(), ROOT)).as_posix(),
         "Split": args.split,
         "Documents": len(corpus),
         "Evaluated queries": metrics["queries"],
@@ -61,18 +77,10 @@ def main():
         "Search": "brute-force matrix similarity",
         "Reranker": "none",
         "Chunking": "none",
-        "MRR cutoff": 10,
+        "Retrieval depth": 10,
     }
     config = "\n".join(f"{key + ':':<22}{value}" for key, value in settings.items())
-    columns = ["Recall@1", "Recall@3", "Recall@5", "Recall@10", "MRR"]
-    # Escape model names so slash-containing model IDs still render correctly.
-    model_label = args.model.replace("|", "\\|").replace("\n", " ")
-    table = (
-        "| Experiment | Model | Representation | " + " | ".join(columns) + " |\n"
-        "|---|---|---|" + "---:|" * len(columns) + "\n"
-        f"| {args.name} | {model_label} | {representation} | "
-        + " | ".join(f"{metrics[key]:.4f}" for key in columns) + " |\n"
-    )
+    table = format_metrics_table(args.name, args.model, representation, metrics)
     report = "# Retrieval Experiments\n\n" + config + "\n\n" + table
     args.output_dir.mkdir(parents=True, exist_ok=True)
     report_path = args.output_dir / f"{args.name}-{timestamp:%Y%m%d-%H%M%S-%f}.txt"

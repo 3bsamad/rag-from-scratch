@@ -24,13 +24,11 @@ python retrieve.py --name mpnet-v0 --model sentence-transformers/all-mpnet-base-
 
 Each run writes `experiments/<name>-<timestamp>.txt` with its configuration, evaluated query count, and a Markdown-style metrics table. Repeated names create separate files. Reports stay visible to Git so useful runs can be committed.
 
-```text
-| Experiment | Model | Representation | Recall@1 | Recall@3 | Recall@5 | Recall@10 | MRR |
-|---|---|---|---:|---:|---:|---:|---:|
-| baseline-v0 | all-MiniLM-L6-v2 | title + full abstract | 0.4823 | 0.6603 | 0.7379 | 0.7833 | 0.6047 |
-```
+| Experiment    | Model              | Representation        | Recall@1 | Recall@3 | Recall@5 | Recall@10 | MRR@10 |
+| ------------- | ------------------ | --------------------- | -------: | -------: | -------: | --------: | -----: |
+| `baseline-v0` | `all-MiniLM-L6-v2` | Title + full abstract |   0.4823 |   0.6603 |   0.7379 |    0.7833 | 0.6047 |
 
-These are the previously measured baseline scores on all 300 test queries. MRR uses the top ten results. Each query is retrieved independently before its metrics are calculated; reported scores are averaged across queries.
+These are the previously measured baseline scores on all 300 test queries. MRR@10 uses the top ten results. Each query is retrieved independently before its metrics are calculated; reported scores are averaged across queries.
 
 Useful flags:
 
@@ -55,7 +53,7 @@ Inspect the dataset with `python inspect_data.py`. Run `python retrieve.py --hel
 rag/
   data.py             # Corpus, query, and qrels loaders
   retrieval.py        # Dense retrieval and corpus embedding cache
-  evaluation.py       # Recall@k and MRR
+  evaluation.py       # Recall@k and MRR@10
 retrieve.py           # Experiment CLI and text reports
 inspect_data.py       # Dataset inspection CLI
 data/scifact/         # Dataset files
@@ -71,7 +69,7 @@ requirements.txt
 - [x] Load SciFact corpus, queries, and relevance labels
 - [x] Encode documents and queries with Sentence Transformers
 - [x] Implement brute-force cosine similarity search
-- [x] Evaluate retrieval using Recall@k and MRR
+- [x] Evaluate retrieval using Recall@k and MRR@10
 - [x] Establish a baseline with `all-MiniLM-L6-v2`
 - [x] Save experiment configurations and results
 

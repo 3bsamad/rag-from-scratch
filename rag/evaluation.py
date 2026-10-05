@@ -65,7 +65,7 @@ def evaluate(queries, qrels, retrieve):
         )
 
         reciprocal_ranks.append(
-            reciprocal_rank(retrieved_ids, relevant_ids)
+            reciprocal_rank(retrieved_ids[:10], relevant_ids)
         )
 
         evaluated += 1
@@ -79,5 +79,5 @@ def evaluate(queries, qrels, retrieve):
         "Recall@3": float(np.mean(recall_3)),
         "Recall@5": float(np.mean(recall_5)),
         "Recall@10": float(np.mean(recall_10)),
-        "MRR": float(np.mean(reciprocal_ranks)),
+        "MRR@10": float(np.mean(reciprocal_ranks)),
     }
