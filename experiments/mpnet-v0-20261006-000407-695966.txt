@@ -1,0 +1,20 @@
+# Retrieval Experiments
+
+Experiment:           mpnet-v0
+Run time:             2026-10-06T00:04:07+02:00
+Model:                sentence-transformers/all-mpnet-base-v2
+Representation:       title + full abstract
+Dataset:              /home/omar/projects/rag-from-scratch/data/scifact
+Split:                test
+Documents:            5183
+Evaluated queries:    300
+Embedding dim:        768
+Similarity:           cosine (normalized embeddings)
+Search:               brute-force matrix similarity
+Reranker:             none
+Chunking:             none
+MRR cutoff:           10
+
+| Experiment | Model | Representation | Recall@1 | Recall@3 | Recall@5 | Recall@10 | MRR |
+|---|---|---|---:|---:|---:|---:|---:|
+| mpnet-v0 | sentence-transformers/all-mpnet-base-v2 | title + full abstract | 0.5146 | 0.6451 | 0.7121 | 0.7901 | 0.6177 |
