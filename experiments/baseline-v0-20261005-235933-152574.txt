@@ -1,0 +1,20 @@
+# Retrieval Experiments
+
+Experiment:           baseline-v0
+Run time:             2026-10-05T23:59:33+02:00
+Model:                all-MiniLM-L6-v2
+Representation:       title + full abstract
+Dataset:              /home/omar/projects/rag-from-scratch/data/scifact
+Split:                test
+Documents:            5183
+Evaluated queries:    300
+Embedding dim:        384
+Similarity:           cosine (normalized embeddings)
+Search:               brute-force matrix similarity
+Reranker:             none
+Chunking:             none
+MRR cutoff:           10
+
+| Experiment | Model | Representation | Recall@1 | Recall@3 | Recall@5 | Recall@10 | MRR |
+|---|---|---|---:|---:|---:|---:|---:|
+| baseline-v0 | all-MiniLM-L6-v2 | title + full abstract | 0.4823 | 0.6603 | 0.7379 | 0.7833 | 0.6047 |

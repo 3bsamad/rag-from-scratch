@@ -70,11 +70,14 @@ def evaluate(queries, qrels, retrieve):
 
         evaluated += 1
 
-    print(f"Evaluated queries: {evaluated}")
+    if not evaluated:
+        raise ValueError("No labeled queries available for evaluation.")
 
-    print(f"Recall@1:  {np.mean(recall_1):.4f}")
-    print(f"Recall@3:  {np.mean(recall_3):.4f}")
-    print(f"Recall@5:  {np.mean(recall_5):.4f}")
-    print(f"Recall@10: {np.mean(recall_10):.4f}")
-
-    print(f"MRR:       {np.mean(reciprocal_ranks):.4f}")
+    return {
+        "queries": evaluated,
+        "Recall@1": float(np.mean(recall_1)),
+        "Recall@3": float(np.mean(recall_3)),
+        "Recall@5": float(np.mean(recall_5)),
+        "Recall@10": float(np.mean(recall_10)),
+        "MRR": float(np.mean(reciprocal_ranks)),
+    }
